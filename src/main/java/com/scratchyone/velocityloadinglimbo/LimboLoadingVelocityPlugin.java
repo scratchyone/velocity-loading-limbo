@@ -77,9 +77,11 @@ public class LimboLoadingVelocityPlugin {
               Objects.requireNonNullElse(SERIALIZER.serialize(kickReason), "unknown");
 
           logger.info("Kick reason: {}", kickReason);
-          logger.info("Kick message: {}", kickMessage);
+          logger.info("Kick message: {}", kickMessage.isEmpty());
 
-          this.limbo.spawnPlayer(kickEvent.getPlayer(), new SessionHandler(kickEvent.getServer()));
+          if (kickMessage.isEmpty())
+            this.limbo.spawnPlayer(
+                kickEvent.getPlayer(), new SessionHandler(kickEvent.getServer()));
 
           // if (CONFIG.debug) {
           // LimboReconnect.getLogger().info("Component: {}", kickReason);

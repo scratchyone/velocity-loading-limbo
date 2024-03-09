@@ -62,9 +62,25 @@ public class LimboLoadingVelocityPlugin {
   @Subscribe(order = PostOrder.FIRST)
   public void onKick(KickedFromServerEvent event) {
     logger.info("kicked: {}", event.kickedDuringServerConnect());
+    // Component kickReason =
+    //     event.getServerKickReason().isPresent()
+    //         ? event.getServerKickReason().get()
+    //         : Component.empty();
+    // String kickMessage = Objects.requireNonNullElse(SERIALIZER.serialize(kickReason), "unknown");
+    //
+    // logger.info("Kick reason: {}", kickReason);
+    // logger.info("Kick message: {}", kickMessage.isEmpty());
+    //
+    // if (kickMessage.isEmpty()) {
+    //   logger.info("Sending player to limbo...");
+    //   this.limbo.spawnPlayer(event.getPlayer(), new SessionHandler(event.getServer()));
+    //   KickedFromServerEvent.Notify notify =
+    //       KickedFromServerEvent.Notify.create(Component.text("Waiting for server to start..."));
+    //   event.setResult(notify);
+    // }
   }
 
-  @Subscribe(order = PostOrder.FIRST)
+  @Subscribe(order = PostOrder.LAST)
   public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
     logger.info("registering...");
     event.setOnKickCallback(
@@ -79,9 +95,16 @@ public class LimboLoadingVelocityPlugin {
           logger.info("Kick reason: {}", kickReason);
           logger.info("Kick message: {}", kickMessage.isEmpty());
 
-          if (kickMessage.isEmpty())
+          if (kickMessage.isEmpty()) {
+            logger.info("Sending player to limbo...");
             this.limbo.spawnPlayer(
                 kickEvent.getPlayer(), new SessionHandler(kickEvent.getServer()));
+            // KickedFromServerEvent.Notify notify =
+            //     KickedFromServerEvent.Notify.create(
+            //         Component.text("Waiting for server to start..."));
+            // kickEvent.setResult(notify);
+            return true;
+          }
 
           // if (CONFIG.debug) {
           // LimboReconnect.getLogger().info("Component: {}", kickReason);
@@ -91,11 +114,7 @@ public class LimboLoadingVelocityPlugin {
           // }
           //
 
-          if (kickMessage.matches("")) {
-            return true;
-          } else {
-            return false;
-          }
+          return false;
         });
   }
 }
